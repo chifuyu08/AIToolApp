@@ -1,11 +1,47 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React, { useEffect, useState } from "react";
 import { Loader, Card, FormField } from "../components/index";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Home = () => {
   const [loading, setLoading] = useState(false);
   const [allPost, setAllPost] = useState(null);
-  const [search, setSearch] = useState(" ");
+  const [searchtext, setSearchtext] = useState("");
+  const [searchedPost, setsearchedPost] = useState(null);
+  const [searchTimeout, setsearchTimeout] = useState(null);
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      setLoading(true);
+      try {
+        const result = await axios.get("http://localhost:8080/api/v1/post/");
+        setAllPost(result.data.data.reverse());
+      } catch (error) {
+        toast.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPost();
+  }, []);
+
+  const handleSearch = (e) => {
+    clearTimeout(setsearchTimeout);
+    setSearchtext(e.target.value);
+    setsearchTimeout(
+      setTimeout(() => {
+        const searchRes = allPost.filter(
+          (item) =>
+            item.name.toLowerCase().includes(searchtext.toLowerCase()) ||
+            item.prompt.toLowerCase().includes(searchtext.toLowerCase())
+        );
+        setsearchedPost(searchRes);
+      }, 500)
+    );
+  };
 
   const RenderCards = ({ data, errorText }) => {
     if (data?.length > 0) {
@@ -29,7 +65,14 @@ const Home = () => {
         </p>
       </div>
       <div className="mt-16">
-        <FormField />
+        <FormField
+          LabelName="Search Text"
+          type="text"
+          name="Search Text"
+          placeholder=""
+          value={searchtext}
+          handleOnChange={handleSearch}
+        />
       </div>
       <div className="mt-10">
         {loading ? (
@@ -38,22 +81,23 @@ const Home = () => {
           </div>
         ) : (
           <>
-            {search && (
+            {searchtext && (
               <h2 className="font-medium text-[#666e75] text-xl mb-3">
                 Showing results for{" "}
-                <span className="text-[#222328]">{search}</span>
+                <span className="text-[#222328]">{searchtext}</span>
               </h2>
             )}
             <div className="grid lg:grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 grid-cols-1 gap-3">
-              {search ? (
-                <RenderCards data={[]} errorText="No Results Found" />
+              {searchtext ? (
+                <RenderCards data={searchedPost} errorText="No Results Found" />
               ) : (
-                <RenderCards data={[]} errorText="No posts found" />
+                <RenderCards data={allPost} errorText="No posts found" />
               )}
             </div>
           </>
         )}
       </div>
+      <ToastContainer />
     </section>
   );
 };

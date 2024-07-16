@@ -1,8 +1,12 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { json, useNavigate } from "react-router-dom";
 import { preview } from "../assets";
 import { FormField, Loader } from "../components";
 import { getrandomPrompt } from "../utils";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const CreatePost = () => {
   const navigate = useNavigate();
@@ -11,17 +15,69 @@ const CreatePost = () => {
     prompt: "",
     photo: "",
   });
+
   const [generatingImg, setGeneratingImg] = useState(false);
   const [loading, setLoading] = useState(false);
-  const handleSubmit = () => {};
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if(form.prompt && form.photo) {
+      setLoading(true);
+    try {
+      const allphoto= await axios.post("http://localhost:8080/api/v1/post/",{
+        name:form.name,
+        prompt: form.prompt,
+        photo:form.photo
+      })
+      // await allphoto.json();
+      navigate('/');
+    } catch (error) {
+      toast.error(error);
+    }
+    finally{
+      setLoading(false);
+    }
+  }
+  else{
+    toast.error("Generate image first");
+  }
+
+  };
+
   const handleChange = (event) => {
     setForm({ ...form, [event.target.name]: event.target.value });
   };
+
   const handleSupriseMe = () => {
     const randomPrompt = getrandomPrompt(form.prompt);
     setForm({ ...form, prompt: randomPrompt });
   };
-  const generateImg = () => {};
+
+  const generateImage = async () => {
+    try {
+      form.photo = "";
+      setGeneratingImg(true);
+      setImageLoaded(false);
+      const response = await axios.post("http://localhost:8080/api/v1/gen/", {
+        prompt: form.prompt,
+      });
+      setForm({ ...form, photo: `${response.data.data[0].asset_url}` });
+    } catch (error) {
+      if (
+        error.toString() === "TypeError: Cannot read properties of undefined (reading '0')"
+      ) {
+        toast.error("Check tomorrow");
+      }
+      setGeneratingImg(false);
+      throw new Error(`${error}`);
+    }
+  };
+
+  const handleImageLoad = () => {
+    setGeneratingImg(false);
+    setImageLoaded(true);
+  };
 
   return (
     <section className="max-w-7xl mx-auto">
@@ -57,6 +113,7 @@ const CreatePost = () => {
               <img
                 src={form.photo}
                 alt={form.prompt}
+                onLoad={handleImageLoad}
                 className="w-full h-full object-contain"
               />
             ) : (
@@ -77,7 +134,7 @@ const CreatePost = () => {
         <div className="mt-5 flex gap-5 ">
           <button
             type="button"
-            onClick={generateImg}
+            onClick={generateImage}
             className="generate_button text-white bg-green-700 font-medium rounded-md w-full px-5 py-2.5 text-sm text-center sm:w-auto "
           >
             {generatingImg ? "Generating..." : "Generate"}
@@ -96,6 +153,7 @@ const CreatePost = () => {
           </button>
         </div>
       </form>
+      <ToastContainer />
     </section>
   );
 };

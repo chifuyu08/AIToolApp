@@ -5,6 +5,8 @@
 * {
     font-family: 'Inter', sans-serif;
 }
+/* For WebKit browsers (Chrome, Safari) */
+
 
 @media screen and (min-width: 480px) {
     .card:nth-child(7n + 1) {
