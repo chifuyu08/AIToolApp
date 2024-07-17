@@ -17,7 +17,7 @@ const Home = () => {
     const fetchPost = async () => {
       setLoading(true);
       try {
-        const result = await axios.get("http://localhost:8080/api/v1/post/");
+        const result = await axios.get("https://aitoolapp.onrender.com/api/v1/post/");
         setAllPost(result.data.data.reverse());
       } catch (error) {
         toast.error(error);

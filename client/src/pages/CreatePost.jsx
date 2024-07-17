@@ -25,7 +25,7 @@ const CreatePost = () => {
     if(form.prompt && form.photo) {
       setLoading(true);
     try {
-      const allphoto= await axios.post("http://localhost:8080/api/v1/post/",{
+      const allphoto= await axios.post("https://aitoolapp.onrender.com/api/v1/post/",{
         name:form.name,
         prompt: form.prompt,
         photo:form.photo
@@ -59,7 +59,7 @@ const CreatePost = () => {
       form.photo = "";
       setGeneratingImg(true);
       setImageLoaded(false);
-      const response = await axios.post("http://localhost:8080/api/v1/gen/", {
+      const response = await axios.post("https://aitoolapp.onrender.com/api/v1/gen/", {
         prompt: form.prompt,
       });
       setForm({ ...form, photo: `${response.data.data[0].asset_url}` });
