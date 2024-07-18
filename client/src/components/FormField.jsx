@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-import React from "react";
 
 function FormField({
   LabelName,
@@ -10,6 +9,7 @@ function FormField({
   handleOnChange,
   isSupriseMe,
   handleSupriseMe,
+  className,
 }) {
   return (
     <div>
@@ -26,7 +26,7 @@ function FormField({
             onClick={handleSupriseMe}
             className="font-semibold text-xs bg-[#ececf1] py-1 px-2 rounded-[5px] text-black"
           >
-           Random Search
+           Random Search 
           </button>
         )}
       </div>
@@ -38,7 +38,8 @@ function FormField({
         value={value}
         onChange={handleOnChange}
         required
-        className="bg-gray-50 border-[1px] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#4649ff] focus:border-[#4649ff] outline-none block w-full p-3"
+        autoComplete="off"
+        className={`${className ? `${className}` : "w-full" } bg-gray-50 border-[1px] border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[#4649ff] focus:border-[#4649ff] outline-none block p-3 `}
       />
     </div>
   );

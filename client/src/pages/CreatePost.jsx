@@ -7,6 +7,9 @@ import { getrandomPrompt } from "../utils";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { TiMicrophone } from "react-icons/ti";
+import Recording from "../components/Recording";
+import Overlay from "../components/Overlay";
 
 const CreatePost = () => {
   const navigate = useNavigate();
@@ -19,30 +22,31 @@ const CreatePost = () => {
   const [generatingImg, setGeneratingImg] = useState(false);
   const [loading, setLoading] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [Recordingaudio, setRecording] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(form.prompt && form.photo) {
+    if (form.prompt && form.photo) {
       setLoading(true);
-    try {
-      const allphoto= await axios.post("https://aitoolapp.onrender.com/api/v1/post/",{
-        name:form.name,
-        prompt: form.prompt,
-        photo:form.photo
-      })
-      // await allphoto.json();
-      navigate('/');
-    } catch (error) {
-      toast.error(error);
+      try {
+        const allphoto = await axios.post(
+          "https://aitoolapp.onrender.com/api/v1/post/",
+          {
+            name: form.name,
+            prompt: form.prompt,
+            photo: form.photo,
+          }
+        );
+        // await allphoto.json();
+        navigate("/");
+      } catch (error) {
+        toast.error(error);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      toast.error("Generate image first");
     }
-    finally{
-      setLoading(false);
-    }
-  }
-  else{
-    toast.error("Generate image first");
-  }
-
   };
 
   const handleChange = (event) => {
@@ -59,13 +63,17 @@ const CreatePost = () => {
       form.photo = "";
       setGeneratingImg(true);
       setImageLoaded(false);
-      const response = await axios.post("https://aitoolapp.onrender.com/api/v1/gen/", {
-        prompt: form.prompt,
-      });
+      const response = await axios.post(
+        "https://aitoolapp.onrender.com/api/v1/gen/",
+        {
+          prompt: form.prompt,
+        }
+      );
       setForm({ ...form, photo: `${response.data.data[0].asset_url}` });
     } catch (error) {
       if (
-        error.toString() === "TypeError: Cannot read properties of undefined (reading '0')"
+        error.toString() ===
+        "TypeError: Cannot read properties of undefined (reading '0')"
       ) {
         toast.error("Check tomorrow");
       }
@@ -74,13 +82,27 @@ const CreatePost = () => {
     }
   };
 
+  const handleRecording =()=>{
+    let newVal=!Recordingaudio;
+    setRecording(newVal);
+  }
+
   const handleImageLoad = () => {
     setGeneratingImg(false);
     setImageLoaded(true);
   };
 
+  const handleRecordingUpdate = (newPrompt) => {
+    setForm((prevForm) => ({
+      ...prevForm,
+      prompt: newPrompt,
+    }));
+  };
+
   return (
-    <section className="max-w-7xl mx-auto">
+    <section className="max-w-7xl mx-auto ">
+      {Recordingaudio && <Recording handleRecording={handleRecording} updatePrompt={handleRecordingUpdate}/>}
+      {Recordingaudio && <Overlay />}
       <div>
         <h1 className="font-extrabold text-[#222328] text-[32px]">Create</h1>
         <p className="mt-2 text-[#666e75] text-[16px] ">
@@ -97,16 +119,22 @@ const CreatePost = () => {
             value={form.name}
             handleOnChange={handleChange}
           />
-          <FormField
-            LabelName="prompt"
-            type="text"
-            name="prompt"
-            placeholder="an oil painting by Matisse of a humanoid robot playing chess"
-            value={form.prompt}
-            handleOnChange={handleChange}
-            isSupriseMe
-            handleSupriseMe={handleSupriseMe}
-          />
+          <div className="flex gap-3">
+            <FormField
+              LabelName="prompt"
+              type="text"
+              name="prompt"
+              placeholder="an oil painting by Matisse of a humanoid robot playing chess"
+              value={form.prompt}
+              handleOnChange={handleChange}
+              isSupriseMe
+              handleSupriseMe={handleSupriseMe}
+              className="w-[45rem]"
+            />
+            <button  type="button" onClick={handleRecording}  className="text-2xl flex mt-8 my-4 p-2">
+              <TiMicrophone />
+            </button>
+          </div>
 
           <div className="photo_preview relative border bg-gray-50 border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-64 p-3 h-64 flex justify-center items-center">
             {form.photo ? (

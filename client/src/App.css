@@ -40,3 +40,8 @@
 .read-the-docs {
   color: #888;
 }
+
+.prompt_text {
+  width: 40vw !important;
+ background-color: red;
+}
