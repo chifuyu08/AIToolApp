@@ -10,7 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { TiMicrophone } from "react-icons/ti";
 import Recording from "../components/Recording";
 import Overlay from "../components/Overlay";
-
+import PrompGen from "../components/PrompGen";
 const CreatePost = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -23,6 +23,7 @@ const CreatePost = () => {
   const [loading, setLoading] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [Recordingaudio, setRecording] = useState(false);
+  const [aiPrompt,setAiprompt]=useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -82,10 +83,10 @@ const CreatePost = () => {
     }
   };
 
-  const handleRecording =()=>{
-    let newVal=!Recordingaudio;
+  const handleRecording = () => {
+    let newVal = !Recordingaudio;
     setRecording(newVal);
-  }
+  };
 
   const handleImageLoad = () => {
     setGeneratingImg(false);
@@ -99,10 +100,21 @@ const CreatePost = () => {
     }));
   };
 
+  const handleAiGen = (newPrompt)=>{
+    setAiprompt(newPrompt);
+  }
+
+
   return (
     <section className="max-w-7xl mx-auto ">
-      {Recordingaudio && <Recording handleRecording={handleRecording} updatePrompt={handleRecordingUpdate}/>}
-      {Recordingaudio && <Overlay />}
+      {Recordingaudio && (
+        <Recording
+          handleRecording={handleRecording}
+          updatePrompt={handleRecordingUpdate}
+        />
+      )}
+      {aiPrompt && (<PrompGen updatePrompt={handleRecordingUpdate} handleAiGen={handleAiGen} />)}
+      {(Recordingaudio || aiPrompt) && <Overlay />}
       <div>
         <h1 className="font-extrabold text-[#222328] text-[32px]">Create</h1>
         <p className="mt-2 text-[#666e75] text-[16px] ">
@@ -130,8 +142,14 @@ const CreatePost = () => {
               isSupriseMe
               handleSupriseMe={handleSupriseMe}
               className="w-[45rem]"
+              ideaboost
+              handleAiGen={handleAiGen}
             />
-            <button  type="button" onClick={handleRecording}  className="text-2xl flex mt-8 my-4 p-2">
+            <button
+              type="button"
+              onClick={handleRecording}
+              className="text-2xl flex mt-8 my-4 p-2"
+            >
               <TiMicrophone />
             </button>
           </div>

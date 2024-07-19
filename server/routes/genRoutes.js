@@ -2,11 +2,10 @@ import express, { response } from 'express';
 import * as dotenv from 'dotenv';
 import fetch from 'node-fetch'
 
+
 dotenv.config();
 
 const router=express.Router()
-
-
 
 router.route("/").post(async(req,res)=>{
   const {prompt} = req.body;

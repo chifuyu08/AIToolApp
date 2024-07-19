@@ -5,6 +5,7 @@ import cors from 'cors';
 import connectDB from './mongodb/connect.js';
 import postRoutes from './routes/postRoutes.js'
 import genRoutes from './routes/genRoutes.js'
+import ideaRoute from './routes/ideaRoute.js'
 dotenv.config();
 
 //middleware
@@ -13,6 +14,8 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use('/api/v1/post',postRoutes);
 app.use('/api/v1/gen',genRoutes);
+app.use('/api/v1/idea',ideaRoute);
+
 
 app.get('/', async (req, res) => {
     res.send("Hello from ALLIN1AI")
